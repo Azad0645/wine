@@ -1,3 +1,4 @@
+import argparse
 from collections import defaultdict
 import pandas as pd
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -18,8 +19,17 @@ def age_with_suffix(age):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Wine catalog site generator")
+    parser.add_argument(
+        "--excel",
+        type=str,
+        default="catalog.xlsx",
+        help="Путь к Excel-файлу с каталогом (по умолчанию catalog.xlsx)"
+    )
+    args = parser.parse_args()
+
     df = pd.read_excel(
-        'catalog.xlsx',
+        args.excel,
         engine='openpyxl',
         na_values=[],
         keep_default_na=False
