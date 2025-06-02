@@ -6,7 +6,7 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
-def age_with_suffix(age):
+def format_age_with_suffix(age):
     if 10 <= age % 100 <= 20:
         suffix = "лет"
     elif age % 10 == 1:
@@ -44,7 +44,7 @@ def main():
     foundation_year = 1920
     current_year = datetime.now().year
     winery_age = current_year - foundation_year
-    winery_age_display = age_with_suffix(winery_age)
+    winery_age_display = format_age_with_suffix(winery_age)
 
     env = Environment(
         loader=FileSystemLoader('.'),
