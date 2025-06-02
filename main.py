@@ -17,38 +17,38 @@ def age_with_suffix(age):
     return f"{age} {suffix}"
 
 
-df = pd.read_excel(
-    'wine3.xlsx',
-    engine='openpyxl',
-    na_values=[],
-    keep_default_na=False
-)
-wines = df.to_dict(orient='records')
+def main():
+    df = pd.read_excel(
+        'catalog.xlsx',
+        engine='openpyxl',
+        na_values=[],
+        keep_default_na=False
+    )
+    wines = df.to_dict(orient='records')
 
+    wines_by_category = defaultdict(list)
+    for wine in wines:
+        category = wine["Категория"]
+        wines_by_category[category].append(wine)
 
-wines_by_category = defaultdict(list)
+    foundation_year = 1920
+    current_year = datetime.now().year
+    winery_age = current_year - foundation_year
+    winery_age_display = age_with_suffix(winery_age)
 
-for wine in wines:
-    category = wine["Категория"]
-    wines_by_category[category].append(wine)
+    env = Environment(
+        loader=FileSystemLoader('.'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
 
+    template = env.get_template("template.html")
+    rendered_page = template.render(wines_by_category=wines_by_category, winery_age=winery_age_display)
 
-foundation_year = 1920
-current_year = datetime.now().year
-winery_age = current_year - foundation_year
-winery_age_display = age_with_suffix(winery_age)
+    with open('index.html', 'w', encoding="utf8") as file:
+        file.write(rendered_page)
 
+    server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+    server.serve_forever()
 
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
-
-template = env.get_template("template.html")
-rendered_page = template.render(wines_by_category=wines_by_category, winery_age=winery_age_display)
-
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
-
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+if __name__ == "__main__":
+    main()
